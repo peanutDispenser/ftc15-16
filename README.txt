@@ -8,4 +8,4 @@ studio doesn't support 8
 "C:\Program Files\Java\[jre version]\bin\;C:\Program Files\Java\[jdk version]\bin\;C:\Windows\System32;"
 in that order
 -edit C:\Users\[name]\Appdata\Local\Android\android-sdk\tools\android.bat
-	-eeeeeeehhhhhhhhhh i got bored im stopping now look up the rest with google
+	-eeeeeeehhhhhhhhhh i got bored im stopping now look up the rest with google?
