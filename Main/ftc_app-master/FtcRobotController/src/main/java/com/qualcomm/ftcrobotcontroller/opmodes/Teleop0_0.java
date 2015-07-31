@@ -33,33 +33,30 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * TeleOp Mode
  * <p>
  * Enables control of the robot via the gamepad
  */
-public class K9Line extends OpMode {
-	
-	final static double MOTOR_POWER = 0.15; // Higher values will cause the robot to move faster
-	final static double HOLD_IR_SIGNAL_STRENGTH = 0.20; // Higher values will cause the robot to follow closer
-	final static double LIGHT_THRESHOLD = 0.5;
+public class Teleop0_0 extends OpMode {
 
-	double armPosition;
-	double clawPosition;
+	/*
+	 * Note: the configuration of the servos is such that
+	 * as the arm servo approaches 0, the arm position moves up (away from the floor).
+	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
+	 */
+	// TETRIX VALUES.
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
-	Servo claw;
-	Servo arm;
-	LightSensor reflectedLight;
-	
+
 	/**
 	 * Constructor
 	 */
-	public K9Line() {
+	public Teleop0_0() {
 
 	}
 
@@ -71,41 +68,27 @@ public class K9Line extends OpMode {
 	@Override
 	public void start() {
 
+
 		/*
-		 * Use the hardwareMap to get the dc motors and servos by name.
-		 * Note that the names of the devices must match the names used
-		 * when you configured your robot and created the configuration file.
+		 * Use the hardwareMap to get the dc motors and servos by name. Note
+		 * that the names of the devices must match the names used when you
+		 * configured your robot and created the configuration file.
 		 */
 		
 		/*
 		 * For the demo Tetrix K9 bot we assume the following,
 		 *   There are two motors "motor_1" and "motor_2"
 		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot..
+		 *   "motor_2" is on the left side of the bot and reversed.
 		 *   
 		 * We also assume that there are two servos "servo_1" and "servo_6"
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-		motorRight = hardwareMap.dcMotor.get("motor_2");
-		motorLeft = hardwareMap.dcMotor.get("motor_1");
+		motorRight = hardwareMap.dcMotor.get("leftMotor");
+		motorLeft = hardwareMap.dcMotor.get("rightMotor");
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
-		
-		arm = hardwareMap.servo.get("servo_1");
-		claw = hardwareMap.servo.get("servo_6");
 
-		// set the starting position of the wrist and claw
-		armPosition = 0.2;
-		clawPosition = 0.25;
-
-		/*
-		 * We also assume that we have a LEGO light sensor
-		 * with a name of "light_sensor" configured for our robot.
-		 */
-		reflectedLight = hardwareMap.lightSensor.get("light_sensor");
-
-        // turn on LED of light sensor.
-        reflectedLight.enableLed(true);
 	}
 
 	/*
@@ -115,60 +98,45 @@ public class K9Line extends OpMode {
 	 */
 	@Override
 	public void loop() {
-		double reflection = 0.0;
-		double left, right = 0.0;
-		
-		// keep manipulator out of the way.
-		arm.setPosition(armPosition);
-		claw.setPosition(clawPosition);
-
-        /*
-         * As a temporary fix, turn on LED in run() event rather than in start().
-         */
-        // turn on LED of light sensor.
-        //reflectedLight.enableLed(true);
 
 		/*
-		 * read the light sensor.
+		 * Gamepad 1
+		 * 
+		 * Gamepad 1 controls the motors via the left stick, and it controls the
+		 * wrist/claw via the a,b, x, y buttons
 		 */
-		reflection = reflectedLight.getLightLevel();
-		
-		/*
-		 * compare measured value to threshold.
-		 */
-		if (reflection < LIGHT_THRESHOLD) {
-			/*
-			 * if reflection is less than the threshold value, then assume we are above dark spot.
-			 * turn to the right.
-			 */
-			left = MOTOR_POWER;
-			right = 0.0;
-		} else {
-			/*
-			 * assume we are over a light spot.
-			 * turn to the left.
-			 */
-			left = 0.0;
-			right = MOTOR_POWER;
-		}
-		
-		/*
-		 * set the motor power
-		 */
-		motorRight.setPower(left);
-		motorLeft.setPower(right);
 
+		// throttle: left_stick_y ranges from -1 to 1, where -1 is full up, and
+		// 1 is full down
+		// direction: left_stick_x ranges from -1 to 1, where -1 is full left
+		// and 1 is full right
+		float throttle = -gamepad1.left_stick_y;
+		float direction = gamepad1.left_stick_x;
+		float right = throttle - direction;
+		float left = throttle + direction;
+
+		// clip the right/left values so that the values never exceed +/- 1
+		right = Range.clip(right, -1, 1);
+		left = Range.clip(left, -1, 1);
+
+		// scale the joystick value to make it easier to control
+		// the robot more precisely at slower speeds.
+		right = (float)scaleInput(right);
+		left =  (float)scaleInput(left);
+		
+		// write the values to the motors
+		motorRight.setPower(right);
+		motorLeft.setPower(left);
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
 		 * a legacy NXT-compatible motor controller, then the getPower() method
 		 * will return a null value. The legacy NXT-compatible motor controllers
 		 * are currently write only.
 		 */
+        telemetry.addData("Text", "*** Robot Data***");
+        telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
+        telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
 
-		telemetry.addData("Text", "*** Robot Data***");
-		telemetry.addData("reflection", "reflection:  " + Double.toString(reflection));
-		telemetry.addData("left tgt pwr",  "left  pwr: " + Double.toString(left));
-		telemetry.addData("right tgt pwr", "right pwr: " + Double.toString(right));
 	}
 
 	/*
@@ -179,6 +147,33 @@ public class K9Line extends OpMode {
 	@Override
 	public void stop() {
 
+	}
+	
+	/*
+	 * This method scales the joystick input so for low joystick values, the 
+	 * scaled value is less than linear.  This is to make it easier to drive
+	 * the robot more precisely at slower speeds.
+	 */
+	double scaleInput(double dVal)  {
+		double[] scaleArray = { 0.0, 0.05, 0.09, 0.10, 0.12, 0.15, 0.18, 0.24,
+				0.30, 0.36, 0.43, 0.50, 0.60, 0.72, 0.85, 1.00, 1.00 };
+		
+		// get the corresponding index for the scaleInput array.
+		int index = (int) (dVal * 16.0);
+		if (index < 0) {
+			index = -index;
+		} else if (index > 16) {
+			index = 16;
+		}
+		
+		double dScale = 0.0;
+		if (dVal < 0) {
+			dScale = -scaleArray[index];
+		} else {
+			dScale = scaleArray[index];
+		}
+		
+		return dScale;
 	}
 
 }
