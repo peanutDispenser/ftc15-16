@@ -33,8 +33,10 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.DeviceManager;
 
 /**
  * TeleOp Mode
@@ -52,6 +54,8 @@ public class Teleop0_0 extends OpMode {
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
+	Servo spinny;
+	LightSensor light;
 
 	/**
 	 * Constructor
@@ -74,19 +78,13 @@ public class Teleop0_0 extends OpMode {
 		 * that the names of the devices must match the names used when you
 		 * configured your robot and created the configuration file.
 		 */
-		
-		/*
-		 * For the demo Tetrix K9 bot we assume the following,
-		 *   There are two motors "motor_1" and "motor_2"
-		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot and reversed.
-		 *   
-		 * We also assume that there are two servos "servo_1" and "servo_6"
-		 *    "servo_1" controls the arm joint of the manipulator.
-		 *    "servo_6" controls the claw joint of the manipulator.
-		 */
+
 		motorRight = hardwareMap.dcMotor.get("leftMotor");
 		motorLeft = hardwareMap.dcMotor.get("rightMotor");
+		spinny = hardwareMap.servo.get("arm");
+		light = hardwareMap.lightSensor.get("light");
+
+		light.enableLed(true);
 		motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
 	}
@@ -127,6 +125,11 @@ public class Teleop0_0 extends OpMode {
 		// write the values to the motors
 		motorRight.setPower(right);
 		motorLeft.setPower(left);
+
+		if (gamepad1.a)
+		{
+
+		}
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
 		 * a legacy NXT-compatible motor controller, then the getPower() method
@@ -136,6 +139,7 @@ public class Teleop0_0 extends OpMode {
         telemetry.addData("Text", "*** Robot Data***");
         telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
         telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
+		telemetry.addData("light sensor", "light: " + String.format("%.2f", light.getLightLevel()));
 
 	}
 
@@ -146,7 +150,7 @@ public class Teleop0_0 extends OpMode {
 	 */
 	@Override
 	public void stop() {
-
+		light.enableLed(false);
 	}
 	
 	/*
