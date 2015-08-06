@@ -35,31 +35,31 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeRegister;
 
 /**
- * Register Op Modes
- */
+* Register Op Modes
+*/
 public class FtcOpModeRegister implements OpModeRegister {
 
-  /**
-   * The Op Mode Manager will call this method when it wants a list of all
-   * available op modes. Add your op mode to the list to enable it.
-   *
-   * @param manager op mode manager
-   */
-  public void register(OpModeManager manager) {
+/**
+* The Op Mode Manager will call this method when it wants a list of all
+* available op modes. Add your op mode to the list to enable it.
+*
+* @param manager op mode manager
+*/
+public void register(OpModeManager manager) {
 
     /*
-     * register your op modes here.
-     * The first parameter is the name of the op mode
-     * The second parameter is the op mode class property
-     *
-     * If two or more op modes are registered with the same name, the app will display an error.
-     */
+    * register your op modes here.
+    * The first parameter is the name of the op mode
+    * The second parameter is the op mode class property
+    *
+    * If two or more op modes are registered with the same name, the app will display an error.
+    */
 
 
     /*
-     * The following op modes are example op modes provided by QualComm.
-     * Uncomment the lines to make the op modes available to the driver station.
-     */
+    * The following op modes are example op modes provided by QualComm.
+    * Uncomment the lines to make the op modes available to the driver station.
+    */
     //manager.register("LinearK9TeleOp", LinearK9TeleOp.class);
     //manager.register("LinearIrExample", LinearIrExample.class);
     //manager.register("IrSeekerOp", IrSeekerOp.class);
@@ -67,19 +67,19 @@ public class FtcOpModeRegister implements OpModeRegister {
     //manager.register("NxtTeleOp", NxtTeleOp.class);
 
     /*
-     * The NullOp op mode
-     */
+    * The NullOp op mode
+    */
     manager.register("NullOp", NullOp.class);
 
 
     /*
-     * The following example op modes are designed to work with a K9-style robot.
-     *  - K9TeleOp is a simple driver controlled program.
-     *  - K9IrSeeker uses a legacy IR seeker V2 sensor to follow a beacon.
-     *  - K9Line uses a legacy LEGO NXT light sensor to follow a white line.
-     */
+    * The following example op modes are designed to work with a K9-style robot.
+    *  - K9TeleOp is a simple driver controlled program.
+    *  - K9IrSeeker uses a legacy IR seeker V2 sensor to follow a beacon.
+    *  - K9Line uses a legacy LEGO NXT light sensor to follow a white line.
+    */
 
-/*    manager.register("K9TeleOp", K9TeleOp.class);
+    /*    manager.register("K9TeleOp", K9TeleOp.class);
     manager.register("K9IrSeeker", K9IrSeeker.class);
     manager.register("K9Line", K9Line.class);
     manager.register("PushBotManual", PushBotManual.class);
@@ -88,6 +88,7 @@ public class FtcOpModeRegister implements OpModeRegister {
     manager.register("PushBotIrSeek", PushBotIrSeek.class);
     manager.register("PushBotSquare", PushBotSquare.class);*/
     manager.register("Teleop0_1", Teleop0_1.class);
+    manager.register("Teleop0_2", Teleop0_2.class);
 
-  }
+    }
 }

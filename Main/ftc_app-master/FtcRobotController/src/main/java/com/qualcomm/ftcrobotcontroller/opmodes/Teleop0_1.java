@@ -33,6 +33,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -57,6 +58,7 @@ public class Teleop0_1 extends OpMode {
   // amount to change the arm servo position.
   double armDelta = 0.1;
 
+  DcMotorController controller;
   DcMotor motorRight;
   DcMotor motorLeft;
   Servo arm;
@@ -77,26 +79,12 @@ public class Teleop0_1 extends OpMode {
   @Override
   public void init() {
 
-
-		/*
-		 * Use the hardwareMap to get the dc motors and servos by name. Note
-		 * that the names of the devices must match the names used when you
-		 * configured your robot and created the configuration file.
-		 */
-		
-		/*
-		 * For the demo Tetrix K9 bot we assume the following,
-		 *   There are two motors "motor_1" and "motor_2"
-		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot and reversed.
-		 *   
-		 * We also assume that there are two servos "servo_1" and "servo_6"
-		 *    "servo_1" controls the arm joint of the manipulator.
-		 *    "servo_6" controls the claw joint of the manipulator.
-		 */
     motorRight = hardwareMap.dcMotor.get("rightMotor");
     motorLeft = hardwareMap.dcMotor.get("leftMotor");
     motorRight.setDirection(DcMotor.Direction.REVERSE);
+
+    controller = hardwareMap.dcMotorController.get("motor1");
+
 
     light = hardwareMap.lightSensor.get("light");
     light.enableLed(true);
@@ -141,9 +129,11 @@ public class Teleop0_1 extends OpMode {
     right = (float)scaleInput(right);
     left =  (float)scaleInput(left);
 
+    controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
     // write the values to the motors
     motorRight.setPower(right);
     motorLeft.setPower(left);
+    controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
 
     // update the position of the arm.
     if (gamepad1.a) {
@@ -176,11 +166,13 @@ public class Teleop0_1 extends OpMode {
 		 * will return a null value. The legacy NXT-compatible motor controllers
 		 * are currently write only.
 		 */
+    controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
     telemetry.addData("Text", "*** Robot Data***");
     telemetry.addData("arm", "arm:  " + String.format("%.2f", armPosition));
     telemetry.addData("light", "light:  " + String.format("%.2f", light.getLightDetected()));
     telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
     telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
+    controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
 
   }
 
