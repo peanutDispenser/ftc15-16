@@ -34,7 +34,9 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -54,7 +56,8 @@ public class Teleop0_2 extends LinearOpMode {
   DcMotor motorRight;
   DcMotor motorLeft;
   DcMotorController controller;
-
+  LightSensor light;
+  TouchSensor bumper;
 
 
   Servo arm;
@@ -65,6 +68,11 @@ public class Teleop0_2 extends LinearOpMode {
     motorRight = hardwareMap.dcMotor.get("rightMotor");
     arm = hardwareMap.servo.get("arm");
     controller = hardwareMap.dcMotorController.get("motor1");
+    bumper = hardwareMap.touchSensor.get("bumper");
+
+    light = hardwareMap.lightSensor.get("light");
+
+
     controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
     motorLeft.setDirection(DcMotor.Direction.REVERSE);
 
@@ -72,6 +80,8 @@ public class Teleop0_2 extends LinearOpMode {
     armPosition = 0.5;
 
     waitForStart();
+
+    light.enableLed(true);
 
     while (opModeIsActive()) {
       // throttle:  left_stick_y ranges from -1 to 1, where -1 is full up,  and 1 is full down
@@ -108,13 +118,19 @@ public class Teleop0_2 extends LinearOpMode {
       arm.setPosition(armPosition);
 
       controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.READ_ONLY);
-      telemetry.addData("Text", "K9TeleOp");
-      telemetry.addData(" left motor", motorLeft.getPower());
+      telemetry.addData("left motor", motorLeft.getPower());
       telemetry.addData("right motor", motorRight.getPower());
       telemetry.addData("arm", arm.getPosition());
+      telemetry.addData("light", light.getLightDetected());
+      telemetry.addData("bumper", bumper.isPressed());
       controller.setMotorControllerDeviceMode(DcMotorController.DeviceMode.WRITE_ONLY);
 
       waitOneHardwareCycle();
     }
+    light.enableLed(false);
+    light.close();
+    motorLeft.close();
+    motorRight.close();
+    arm.close();
   }
 }
