@@ -43,16 +43,14 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class K9Line extends OpMode {
 	
-	final static double MOTOR_POWER = 0.15; // Higher values will cause the robot to move faster
-	final static double HOLD_IR_SIGNAL_STRENGTH = 0.20; // Higher values will cause the robot to follow closer
-	final static double LIGHT_THRESHOLD = 170;
+	final static double MOTOR_POWER = 0.05; // Higher values will cause the robot to move faster
+	final static double LIGHT_THRESHOLD = 0.55;
 
 	double armPosition;
 	double clawPosition;
 
 	DcMotor motorRight;
 	DcMotor motorLeft;
-	Servo claw;
 	Servo arm;
 	LightSensor reflectedLight;
 	
@@ -87,22 +85,20 @@ public class K9Line extends OpMode {
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-		motorRight = hardwareMap.dcMotor.get("motor_2");
-		motorLeft = hardwareMap.dcMotor.get("motor_1");
-		motorLeft.setDirection(DcMotor.Direction.REVERSE);
+		motorRight = hardwareMap.dcMotor.get("rightMotor");
+		motorLeft = hardwareMap.dcMotor.get("leftMotor");
+		motorRight.setDirection(DcMotor.Direction.REVERSE);
 		
-		arm = hardwareMap.servo.get("servo_1");
-		claw = hardwareMap.servo.get("servo_6");
+		arm = hardwareMap.servo.get("arm");
 
 		// set the starting position of the wrist and claw
 		armPosition = 0.2;
-		clawPosition = 0.25;
 
 		/*
 		 * We also assume that we have a LEGO light sensor
 		 * with a name of "light_sensor" configured for our robot.
 		 */
-		reflectedLight = hardwareMap.lightSensor.get("light_sensor");
+		reflectedLight = hardwareMap.lightSensor.get("light");
 
 		// turn on LED of light sensor.
 		reflectedLight.enableLed(true);
@@ -115,19 +111,18 @@ public class K9Line extends OpMode {
 	 */
 	@Override
 	public void loop() {
-		int reflection = 0;
+		double reflection;
 		double left, right = 0.0;
 		
 		// keep manipulator out of the way.
 		arm.setPosition(armPosition);
-		claw.setPosition(clawPosition);
 
 		/*
 		 * read the light sensor.
 		 */
 
 		//reflection = reflectedLight.getLightLevel();
-		reflection = reflectedLight.getLightDetectedRaw();
+		reflection = reflectedLight.getLightDetected();
 		
 		/*
 		 * compare measured value to threshold.
@@ -138,13 +133,13 @@ public class K9Line extends OpMode {
 			 * turn to the right.
 			 */
 			left = MOTOR_POWER;
-			right = 0.0;
+			right = 0.015;
 		} else {
 			/*
 			 * assume we are over a light spot.
 			 * turn to the left.
 			 */
-			left = 0.0;
+			left = 0.015;
 			right = MOTOR_POWER;
 		}
 		
