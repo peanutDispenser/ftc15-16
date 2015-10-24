@@ -49,12 +49,16 @@ public class Teleop0_1 extends OpMode {
 	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
 	 */
     // TETRIX VALUES.
-	final float MAXPOWER = (float) .75;
+	final float MAXPOWER = (float) .5;
+	final float TRIGGERTHRESHOLD = (float) .65;
 
 	DcMotor motorRU;	// Right front
 	DcMotor motorLU;	// Right back
 	DcMotor motorLD;	// Left back
 	DcMotor motorRD;	// Left front
+	DcMotor extend1;
+	DcMotor extend2;
+	DcMotor turn;
 
 	//DcMotor arm;		// Arm
 
@@ -92,6 +96,9 @@ public class Teleop0_1 extends OpMode {
 		motorLU = hardwareMap.dcMotor.get("motorLU");
 		motorRD = hardwareMap.dcMotor.get("motorRD");
 		motorLD = hardwareMap.dcMotor.get("motorLD");
+		extend1 = hardwareMap.dcMotor.get("extend1");
+		extend2 = hardwareMap.dcMotor.get("extend2");
+		turn = hardwareMap.dcMotor.get("turn");
 
 		//arm = hardwareMap.dcMotor.get("arm");
 
@@ -119,6 +126,9 @@ public class Teleop0_1 extends OpMode {
         float left = gamepad1.left_stick_y;
         float right = gamepad1.right_stick_y;
 
+		float leftTrigger = gamepad1.left_trigger;
+		float rightTrigger = gamepad1.right_trigger;
+
 		// clip the right/left values so that the values never exceed +/- 1
 		right = Range.clip(right, -MAXPOWER, MAXPOWER);
 		left = Range.clip(left, -MAXPOWER, MAXPOWER);
@@ -129,6 +139,43 @@ public class Teleop0_1 extends OpMode {
 		motorRD.setPower(right);
 		motorLD.setPower(left);
 
+		if (gamepad1.left_bumper){
+			extend1.setPower(0.5);
+			extend2.setPower(0.5);
+		}
+		if (leftTrigger > TRIGGERTHRESHOLD) {
+			extend1.setPower(-0.5);
+			extend2.setPower(-0.5);
+		}
+
+		if (gamepad1.right_bumper)
+			turn.setPower(0.5);
+
+		if (rightTrigger > TRIGGERTHRESHOLD)
+			turn.setPower(-0.5);
+
+		if (gamepad1.start) {
+			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
+				motorLD.setDirection(DcMotor.Direction.FORWARD);
+			else
+				motorLD.setDirection(DcMotor.Direction.REVERSE);
+
+
+			if (motorLU.getDirection() == DcMotor.Direction.REVERSE)
+				motorLU.setDirection(DcMotor.Direction.FORWARD);
+			else
+				motorLU.setDirection(DcMotor.Direction.REVERSE);
+
+			if (motorRD.getDirection() == DcMotor.Direction.REVERSE)
+				motorRD.setDirection(DcMotor.Direction.FORWARD);
+			else
+				motorRD.setDirection(DcMotor.Direction.REVERSE);
+
+			if (motorRU.getDirection() == DcMotor.Direction.REVERSE)
+				motorRU.setDirection(DcMotor.Direction.FORWARD);
+			else
+				motorRU.setDirection(DcMotor.Direction.REVERSE);
+		}
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
 		 * a legacy NXT-compatible motor controller, then the getPower() method
@@ -139,6 +186,9 @@ public class Teleop0_1 extends OpMode {
 		telemetry.addData("Text", "*** Robot Data***");
 		telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
 		telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
+		telemetry.addData("left trigger", "left trigger: " + String.format("%.2f", gamepad1.left_trigger));
+		telemetry.addData("right trigger", "right trigger: " + String.format("%.2f", gamepad1.right_trigger));
+
 
 
 	}
