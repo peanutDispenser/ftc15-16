@@ -51,7 +51,8 @@ public class Test extends OpMode {
 	 */
     // TETRIX VALUES.
 
-	DcMotor go;
+//	DcMotor go;
+	LightSensor holy;
 
 	/**
 	 * Constructor
@@ -70,7 +71,7 @@ public class Test extends OpMode {
 		/*
 		 * Use the hardwareMap to get the dc motors and servos by name. Note
 		 * that the names of the devices must match the names used when you
-		 * configured your robot and created the configuration file.
+		 * configured your robot andpppppppppp3pppppp141214231423142314231423142 created the configuration file.
 		 */
 		
 		/*
@@ -83,7 +84,10 @@ public class Test extends OpMode {
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-   		go = hardwareMap.dcMotor.get("go");
+//		go = hardwareMap.dcMotor.get("go");
+		holy = hardwareMap.lightSensor.get("light");
+
+		holy.enableLed(true);
 	}
 
 	/*
@@ -106,8 +110,9 @@ public class Test extends OpMode {
         float right = -gamepad1.right_stick_y;
 
 		right = Range.clip(right, -1, 1);
+		telemetry.addData("reflection", "reflection:  " + Double.toString(holy.getLightDetected()));
 			// write the values to the motors
-		go.setPower(right);
+//		go.setPower(right);
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
@@ -119,12 +124,12 @@ public class Test extends OpMode {
 
 	/*
 	 * Code to run when the op mode is first disabled goes here
-	 * 
+	 *
 	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
 	 */
 	@Override
 	public void stop() {
-
+		holy.enableLed(false);
 	}
 	
 	/*

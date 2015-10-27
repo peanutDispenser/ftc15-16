@@ -172,7 +172,7 @@ public class K9Line extends OpMode {
 	}
 
 	/*
-	 * Code to run when the op mode is first disabled goes here
+	 * Code to run when tK9LineK9Lineyhe op mode is first disabled goes here
 	 * 
 	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
 	 */

@@ -40,7 +40,7 @@ import com.qualcomm.robotcore.util.Range;
  * <p>
  * Enables control of the robot via the gamepad
  */
-public class Teleop0_1 extends OpMode {
+public class Teleop0_2 extends OpMode {
 
 	/*
 	 * Note: the configuration of the servos is such that
@@ -57,16 +57,16 @@ public class Teleop0_1 extends OpMode {
 	DcMotor motorLU;	// Right back
 	DcMotor motorLD;	// Left back
 	DcMotor motorRD;	// Left front
+
 	DcMotor extend1;
 	DcMotor extend2;
-	DcMotor turn;
 
-	//DcMotor arm;		// Arm
+	DcMotor turn;
 
 	/**
 	 * Constructor
 	 */
-	public Teleop0_1() {
+	public Teleop0_2() {
 
 	}
 
@@ -97,11 +97,11 @@ public class Teleop0_1 extends OpMode {
 		motorLU = hardwareMap.dcMotor.get("motorLU");
 		motorRD = hardwareMap.dcMotor.get("motorRD");
 		motorLD = hardwareMap.dcMotor.get("motorLD");
+
 		extend1 = hardwareMap.dcMotor.get("extend1");
 		extend2 = hardwareMap.dcMotor.get("extend2");
-		turn = hardwareMap.dcMotor.get("turn");
 
-		//arm = hardwareMap.dcMotor.get("arm");
+		turn = hardwareMap.dcMotor.get("turn");
 
 		motorRU.setDirection(DcMotor.Direction.REVERSE);
 		motorRD.setDirection(DcMotor.Direction.REVERSE);
@@ -127,9 +127,6 @@ public class Teleop0_1 extends OpMode {
         float left = gamepad1.left_stick_y;
         float right = gamepad1.right_stick_y;
 
-		float leftTrigger = gamepad1.left_trigger;
-		float rightTrigger = gamepad1.right_trigger;
-
 		// clip the right/left values so that the values never exceed +/- 1
 		right = Range.clip(right, -MAXDRIVEPOWER, MAXDRIVEPOWER);
 		left = Range.clip(left, -MAXDRIVEPOWER, MAXDRIVEPOWER);
@@ -145,7 +142,7 @@ public class Teleop0_1 extends OpMode {
 			extend2.setPower(0.5);
 			sMotors = true;
 		}
-		if (leftTrigger > TRIGGERTHRESHOLD) {
+		if (gamepad1.left_trigger > TRIGGERTHRESHOLD) {
 			extend1.setPower(-0.5);
 			extend2.setPower(-0.5);
 			sMotors = true;
@@ -153,16 +150,20 @@ public class Teleop0_1 extends OpMode {
 
 		if (gamepad1.right_bumper) {
 			turn.setPower(0.5);
+//			if(turn.getPower() >= .5)									// CHANGE: checks if power is set
+//				sMotors = true;
+//			else
+//				sMotors = false;
 			sMotors = true;
 		}
 
-		if (rightTrigger > TRIGGERTHRESHOLD)  {
-			turn.setPower(-0.5);
+		if (gamepad1.right_trigger > TRIGGERTHRESHOLD)  {
+			turn.setPower(gamepad1.right_trigger/2);					// CHANGE: changed from float .5 to gamepad1.right_trigger/2
 			sMotors = true;
 		}
 
 
-		if (gamepad1.start) {
+	/*	if (gamepad1.s4253642134416416246242652425q35g43241324324132413241324tart) {
 			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
 				motorLD.setDirection(DcMotor.Direction.FORWARD);
 			else
@@ -183,7 +184,7 @@ public class Teleop0_1 extends OpMode {
 				motorRU.setDirection(DcMotor.Direction.FORWARD);
 			else
 				motorRU.setDirection(DcMotor.Direction.REVERSE);
-		}
+		}*/
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
