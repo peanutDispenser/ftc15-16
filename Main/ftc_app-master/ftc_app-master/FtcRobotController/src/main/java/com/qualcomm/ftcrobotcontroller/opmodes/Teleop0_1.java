@@ -48,10 +48,10 @@ public class Teleop0_1 extends OpMode {
 	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
 	 */
     // TETRIX VALUES.
-	final float MAXDRIVEPOWER = (float) 1;
-	final float TRIGGERTHRESHOLD = (float) .65;
+	final float MAXDRIVEPOWER = 1.0f;
+	final float TRIGGERTHRESHOLD = .65f;
 
-	boolean sMotors = false;
+	//boolean sMotors = false;
 
 	DcMotor motorRU;	// Right front
 	DcMotor motorLU;	// Right back
@@ -70,11 +70,6 @@ public class Teleop0_1 extends OpMode {
 
 	}
 
-	/*
-	 * Code to run when the op mode is first enabled goes here
-	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#start()
-	 */
 	@Override
 	public void init() {
 		/*
@@ -82,17 +77,7 @@ public class Teleop0_1 extends OpMode {
 		 * that the names of the devices must match the names used when you
 		 * configured your robot and created the configuration file.
 		 */
-		
-		/*
-		 * For the demo Tetrix K9 bot we assume the following,
-		 *   There are two motors "motor_1" and "motor_2"
-		 *   "motor_1" is on the right side of the bot.
-		 *   "motor_2" is on the left side of the bot.
-		 *   
-		 * We also assume that there are two servos "servo_1" and "servo_6"
-		 *    "servo_1" controls the arm joint of the manipulator.
-		 *    "servo_6" controls the claw joint of the manipulator.
-		 */
+
 		motorRU = hardwareMap.dcMotor.get("motorRU");
 		motorLU = hardwareMap.dcMotor.get("motorLU");
 		motorRD = hardwareMap.dcMotor.get("motorRD");
@@ -117,18 +102,12 @@ public class Teleop0_1 extends OpMode {
 
 		/*
 		 * Gamepad 1
-		 * 
-		 * Gamepad 1 controls the motors via the left stick, and it controls the
-		 * wrist/claw via the a,b, x, y buttons
 		 */
 
         // tank drive
         // note that if y equal -1 then joystick is pushed all of the way forward.
         float left = gamepad1.left_stick_y;
         float right = gamepad1.right_stick_y;
-
-		float leftTrigger = gamepad1.left_trigger;
-		float rightTrigger = gamepad1.right_trigger;
 
 		// clip the right/left values so that the values never exceed +/- 1
 		right = Range.clip(right, -MAXDRIVEPOWER, MAXDRIVEPOWER);
@@ -143,47 +122,47 @@ public class Teleop0_1 extends OpMode {
 		if (gamepad1.left_bumper){
 			extend1.setPower(0.5);
 			extend2.setPower(0.5);
-			sMotors = true;
+			//sMotors = true;
 		}
-		if (leftTrigger > TRIGGERTHRESHOLD) {
+		if (gamepad1.left_trigger > TRIGGERTHRESHOLD) {
 			extend1.setPower(-0.5);
 			extend2.setPower(-0.5);
-			sMotors = true;
+			//sMotors = true;
 		}
 
 		if (gamepad1.right_bumper) {
 			turn.setPower(0.5);
-			sMotors = true;
+			//sMotors = true;
 		}
 
-		if (rightTrigger > TRIGGERTHRESHOLD)  {
+		if (gamepad1.right_trigger > TRIGGERTHRESHOLD)  {
 			turn.setPower(-0.5);
-			sMotors = true;
+			//sMotors = true;
 		}
 
 
-		if (gamepad1.start) {
-			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
-				motorLD.setDirection(DcMotor.Direction.FORWARD);
-			else
-				motorLD.setDirection(DcMotor.Direction.REVERSE);
-
-
-			if (motorLU.getDirection() == DcMotor.Direction.REVERSE)
-				motorLU.setDirection(DcMotor.Direction.FORWARD);
-			else
-				motorLU.setDirection(DcMotor.Direction.REVERSE);
-
-			if (motorRD.getDirection() == DcMotor.Direction.REVERSE)
-				motorRD.setDirection(DcMotor.Direction.FORWARD);
-			else
-				motorRD.setDirection(DcMotor.Direction.REVERSE);
-
-			if (motorRU.getDirection() == DcMotor.Direction.REVERSE)
-				motorRU.setDirection(DcMotor.Direction.FORWARD);
-			else
-				motorRU.setDirection(DcMotor.Direction.REVERSE);
-		}
+//		if (gamepad1.start) { //Must change motor controller mode to read, then back to read
+//			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
+//				motorLD.setDirection(DcMotor.Direction.FORWARD);
+//			else
+//				motorLD.setDirection(DcMotor.Direction.REVERSE);
+//
+//
+//			if (motorLU.getDirection() == DcMotor.Direction.REVERSE)
+//				motorLU.setDirection(DcMotor.Direction.FORWARD);
+//			else
+//				motorLU.setDirection(DcMotor.Direction.REVERSE);
+//
+//			if (motorRD.getDirection() == DcMotor.Direction.REVERSE)
+//				motorRD.setDirection(DcMotor.Direction.FORWARD);
+//			else
+//				motorRD.setDirection(DcMotor.Direction.REVERSE);
+//
+//			if (motorRU.getDirection() == DcMotor.Direction.REVERSE)
+//				motorRU.setDirection(DcMotor.Direction.FORWARD);
+//			else
+//				motorRU.setDirection(DcMotor.Direction.REVERSE);
+//		}
 
 		/*
 		 * Send telemetry data back to driver station. Note that if we are using
@@ -197,7 +176,7 @@ public class Teleop0_1 extends OpMode {
 		telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
 		telemetry.addData("left trigger", "left trigger: " + String.format("%.2f", gamepad1.left_trigger));
 		telemetry.addData("right trigger", "right trigger: " + String.format("%.2f", gamepad1.right_trigger));
-		telemetry.addData("special motors", "special motors: " + String.valueOf(sMotors));
+		//telemetry.addData("special motors", "special motors: " + String.valueOf(sMotors));
 
 
 
@@ -212,11 +191,4 @@ public class Teleop0_1 extends OpMode {
 	public void stop() {
 
 	}
-	
-	/*
-	 * This method scales the joystick input so for low joystick values, the 
-	 * scaled value is less than linear.  This is to make it easier to drive
-	 * the robot more precisely at slower speeds.
-	 */
-
 }
