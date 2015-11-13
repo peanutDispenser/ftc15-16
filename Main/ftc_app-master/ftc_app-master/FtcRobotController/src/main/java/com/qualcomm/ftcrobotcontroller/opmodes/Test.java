@@ -51,8 +51,8 @@ public class Test extends OpMode {
 	 */
     // TETRIX VALUES.
 
-//	DcMotor go;
-	LightSensor holy;
+	DcMotor go;
+//	LightSensor holy;
 
 	/**
 	 * Constructor
@@ -84,10 +84,10 @@ public class Test extends OpMode {
 		 *    "servo_1" controls the arm joint of the manipulator.
 		 *    "servo_6" controls the claw joint of the manipulator.
 		 */
-//		go = hardwareMap.dcMotor.get("go");
-		holy = hardwareMap.lightSensor.get("light");
+		go = hardwareMap.dcMotor.get("go");
+//		holy = hardwareMap.lightSensor.get("light");
 
-		holy.enableLed(true);
+//		holy.enableLed(true);
 	}
 
 	/*
@@ -110,7 +110,7 @@ public class Test extends OpMode {
         float right = -gamepad1.right_stick_y;
 
 		right = Range.clip(right, -1, 1);
-		telemetry.addData("reflection", "reflection:  " + Double.toString(holy.getLightDetected()));
+		telemetry.addData("joy", "joy1r: " + String.format("%.2f", -gamepad1.right_stick_y));
 			// write the values to the motors
 //		go.setPower(right);
 
@@ -129,7 +129,7 @@ public class Test extends OpMode {
 	 */
 	@Override
 	public void stop() {
-		holy.enableLed(false);
+		//holy.enableLed(false);
 	}
 	
 	/*

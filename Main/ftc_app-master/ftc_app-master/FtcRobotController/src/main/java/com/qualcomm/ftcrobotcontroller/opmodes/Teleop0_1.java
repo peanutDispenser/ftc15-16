@@ -33,6 +33,7 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
 /**
@@ -49,7 +50,10 @@ public class Teleop0_1 extends OpMode {
 	 */
     // TETRIX VALUES.
 	final float MAXDRIVEPOWER = 1.0f;
+	final float MAXSPECIALPOWER = 0.7f;
+	final float PEOPLECHANGE = 0.02f;
 	final float TRIGGERTHRESHOLD = .65f;
+	final float WALLCHANGE = 0.05f;
 
 	//boolean sMotors = false;
 
@@ -61,6 +65,11 @@ public class Teleop0_1 extends OpMode {
 	DcMotor extend2;
 	DcMotor turn;
 
+	Servo wall;
+	float wallPlace;
+
+	Servo people;
+	float peoplePlace;
 	//DcMotor arm;		// Arm
 
 	/**
@@ -85,6 +94,8 @@ public class Teleop0_1 extends OpMode {
 		extend1 = hardwareMap.dcMotor.get("extend1");
 		extend2 = hardwareMap.dcMotor.get("extend2");
 		turn = hardwareMap.dcMotor.get("turn");
+		wall = hardwareMap.servo.get("wall");
+		people = hardwareMap.servo.get("people");
 
 		//arm = hardwareMap.dcMotor.get("arm");
 
@@ -113,33 +124,63 @@ public class Teleop0_1 extends OpMode {
 		right = Range.clip(right, -MAXDRIVEPOWER, MAXDRIVEPOWER);
 		left = Range.clip(left, -MAXDRIVEPOWER, MAXDRIVEPOWER);
 
+		float leftTrigger = gamepad1.left_trigger;
+		float rightTrigger = gamepad1.right_trigger;
+
+		if (leftTrigger > TRIGGERTHRESHOLD)
+		{
+			extend1.setPower(MAXSPECIALPOWER);
+			extend2.setPower(-MAXSPECIALPOWER);
+		}
+		else if (rightTrigger > TRIGGERTHRESHOLD)
+		{
+			extend1.setPower(-MAXSPECIALPOWER);
+			extend2.setPower(MAXSPECIALPOWER);
+		}
+		else
+		{
+			extend1.setPower(0);
+			extend2.setPower(0);
+		}
+
+		if (gamepad1.left_bumper)
+		{
+			turn.setPower(MAXSPECIALPOWER);
+		}
+		else if (gamepad1.right_bumper)
+		{
+			turn.setPower(-MAXSPECIALPOWER);
+		}
+		else
+		{
+			turn.setPower(0);
+		}
+
+		if (gamepad1.a)
+		{
+			peoplePlace += PEOPLECHANGE;
+		}
+		else if (gamepad1.b)
+		{
+			peoplePlace -= PEOPLECHANGE;
+		}
+
+		if (gamepad1.x)
+		{
+			wallPlace += WALLCHANGE;
+		}
+		else if (gamepad1.y)
+		{
+			wallPlace -= WALLCHANGE;
+		}
 		// write the values to the motors
 		motorRU.setPower(right);
 		motorLU.setPower(left);
 		motorRD.setPower(right);
 		motorLD.setPower(left);
 
-		if (gamepad1.left_bumper){
-			extend1.setPower(0.5);
-			extend2.setPower(0.5);
-			//sMotors = true;
-		}
-		if (gamepad1.left_trigger > TRIGGERTHRESHOLD) {
-			extend1.setPower(-0.5);
-			extend2.setPower(-0.5);
-			//sMotors = true;
-		}
-
-		if (gamepad1.right_bumper) {
-			turn.setPower(0.5);
-			//sMotors = true;
-		}
-
-		if (gamepad1.right_trigger > TRIGGERTHRESHOLD)  {
-			turn.setPower(-0.5);
-			//sMotors = true;
-		}
-
+		wall.setPosition(wallPlace);
+		people.setPosition(peoplePlace);
 
 //		if (gamepad1.start) { //Must change motor controller mode to read, then back to read
 //			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
