@@ -38,78 +38,78 @@ import com.qualcomm.robotcore.util.Range;
 
 /**
  * TeleOp Mode
- * <p>
+ * <p/>
  * Enables control of the robot via the gamepad
  */
 public class Teleop0_1 extends OpMode {
 
-	/*
-	 * Note: the configuration of the servos is such that
-	 * as the arm servo approaches 0, the arm position moves up (away from the floor).
-	 * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
-	 */
+    /*
+     * Note: the configuration of the servos is such that
+     * as the arm servo approaches 0, the arm position moves up (away from the floor).
+     * Also, as the claw servo approaches 0, the claw opens up (drops the game element).
+     */
     // TETRIX VALUES.
-	final float MAXDRIVEPOWER = 1.0f;
-	final float MAXSPECIALPOWER = 0.7f;
-	final float PEOPLECHANGE = 0.02f;
-	final float TRIGGERTHRESHOLD = .65f;
-	final float WALLCHANGE = 0.05f;
+    final float MAXDRIVEPOWER = 1.0f;
+    final float MAXSPECIALPOWER = 0.7f;
+    final float PEOPLECHANGE = 0.1f;
+    final float TRIGGERTHRESHOLD = .65f;
+    final float WALLCHANGE = 0.1f;
 
-	//boolean sMotors = false;
+    //boolean sMotors = false;
 
-	DcMotor motorRU;	// Right front
-	DcMotor motorLU;	// Right back
-	DcMotor motorLD;	// Left back
-	DcMotor motorRD;	// Left front
-	DcMotor extend1;
-	DcMotor extend2;
-	DcMotor turn;
+    DcMotor motorRU;    // Right front
+    DcMotor motorLU;    // Right back
+    DcMotor motorLD;    // Left back
+    DcMotor motorRD;    // Left front
+    DcMotor extend1;
+    DcMotor extend2;
+    DcMotor turn;
 
-	Servo wall;
-	float wallPlace;
+    Servo wall;
+    float wallPlace;
 
-	Servo people;
-	float peoplePlace;
-	//DcMotor arm;		// Arm
+    Servo people;
+    float peoplePlace;
+    //DcMotor arm;		// Arm
 
-	/**
-	 * Constructor
-	 */
-	public Teleop0_1() {
+    /**
+     * Constructor
+     */
+    public Teleop0_1() {
 
-	}
+    }
 
-	@Override
-	public void init() {
-		/*
+    @Override
+    public void init() {
+        /*
 		 * Use the hardwareMap to get the dc motors and servos by name. Note
 		 * that the names of the devices must match the names used when you
 		 * configured your robot and created the configuration file.
 		 */
 
-		motorRU = hardwareMap.dcMotor.get("motorRU");
-		motorLU = hardwareMap.dcMotor.get("motorLU");
-		motorRD = hardwareMap.dcMotor.get("motorRD");
-		motorLD = hardwareMap.dcMotor.get("motorLD");
-		extend1 = hardwareMap.dcMotor.get("extend1");
-		extend2 = hardwareMap.dcMotor.get("extend2");
-		turn = hardwareMap.dcMotor.get("turn");
-		wall = hardwareMap.servo.get("wall");
-		people = hardwareMap.servo.get("people");
+        motorRU = hardwareMap.dcMotor.get("motorRU");
+        motorLU = hardwareMap.dcMotor.get("motorLU");
+        motorRD = hardwareMap.dcMotor.get("motorRD");
+        motorLD = hardwareMap.dcMotor.get("motorLD");
+        extend1 = hardwareMap.dcMotor.get("extend1");
+        extend2 = hardwareMap.dcMotor.get("extend2");
+        turn = hardwareMap.dcMotor.get("turn");
+        wall = hardwareMap.servo.get("wall");
+        people = hardwareMap.servo.get("people");
 
-		//arm = hardwareMap.dcMotor.get("arm");
+        //arm = hardwareMap.dcMotor.get("arm");
 
-		motorRU.setDirection(DcMotor.Direction.REVERSE);
-		motorRD.setDirection(DcMotor.Direction.REVERSE);
-	}
+        motorRU.setDirection(DcMotor.Direction.REVERSE);
+        motorRD.setDirection(DcMotor.Direction.REVERSE);
+    }
 
-	/*
-	 * This method will be called repeatedly in a loop
-	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
-	 */
-	@Override
-	public void loop() {
+    /*
+     * This method will be called repeatedly in a loop
+     *
+     * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#run()
+     */
+    @Override
+    public void loop() {
 
 		/*
 		 * Gamepad 1
@@ -120,67 +120,51 @@ public class Teleop0_1 extends OpMode {
         float left = gamepad1.left_stick_y;
         float right = gamepad1.right_stick_y;
 
-		// clip the right/left values so that the values never exceed +/- 1
-		right = Range.clip(right, -MAXDRIVEPOWER, MAXDRIVEPOWER);
-		left = Range.clip(left, -MAXDRIVEPOWER, MAXDRIVEPOWER);
+        // clip the right/left values so that the values never exceed +/- 1
+        right = Range.clip(right, -MAXDRIVEPOWER, MAXDRIVEPOWER);
+        left = Range.clip(left, -MAXDRIVEPOWER, MAXDRIVEPOWER);
 
-		float leftTrigger = gamepad1.left_trigger;
-		float rightTrigger = gamepad1.right_trigger;
+        float leftTrigger = gamepad1.left_trigger;
+        float rightTrigger = gamepad1.right_trigger;
 
-		if (leftTrigger > TRIGGERTHRESHOLD)
-		{
-			extend1.setPower(MAXSPECIALPOWER);
-			extend2.setPower(-MAXSPECIALPOWER);
-		}
-		else if (rightTrigger > TRIGGERTHRESHOLD)
-		{
-			extend1.setPower(-MAXSPECIALPOWER);
-			extend2.setPower(MAXSPECIALPOWER);
-		}
-		else
-		{
-			extend1.setPower(0);
-			extend2.setPower(0);
-		}
+        if (leftTrigger > TRIGGERTHRESHOLD) {
+            extend1.setPower(MAXSPECIALPOWER);
+            extend2.setPower(-MAXSPECIALPOWER);
+        } else if (rightTrigger > TRIGGERTHRESHOLD) {
+            extend1.setPower(-MAXSPECIALPOWER);
+            extend2.setPower(MAXSPECIALPOWER);
+        } else {
+            extend1.setPower(0);
+            extend2.setPower(0);
+        }
 
-		if (gamepad1.left_bumper)
-		{
-			turn.setPower(MAXSPECIALPOWER);
-		}
-		else if (gamepad1.right_bumper)
-		{
-			turn.setPower(-MAXSPECIALPOWER);
-		}
-		else
-		{
-			turn.setPower(0);
-		}
+        if (gamepad1.left_bumper) {
+            turn.setPower(MAXSPECIALPOWER);
+        } else if (gamepad1.right_bumper) {
+            turn.setPower(-MAXSPECIALPOWER);
+        } else {
+            turn.setPower(0);
+        }
 
-		if (gamepad1.a)
-		{
-			peoplePlace += PEOPLECHANGE;
-		}
-		else if (gamepad1.b)
-		{
-			peoplePlace -= PEOPLECHANGE;
-		}
+        if (gamepad1.a && peoplePlace < .9) {
+            peoplePlace += PEOPLECHANGE;
+        } else if (gamepad1.b && peoplePlace > .2) {
+            peoplePlace -= PEOPLECHANGE;
+        }
 
-		if (gamepad1.x)
-		{
-			wallPlace += WALLCHANGE;
-		}
-		else if (gamepad1.y)
-		{
-			wallPlace -= WALLCHANGE;
-		}
-		// write the values to the motors
-		motorRU.setPower(right);
-		motorLU.setPower(left);
-		motorRD.setPower(right);
-		motorLD.setPower(left);
+        if (gamepad1.x && wallPlace < 0.9) {
+            wallPlace += WALLCHANGE;
+        } else if (gamepad1.y && wallPlace > 0.2) {
+            wallPlace -= WALLCHANGE;
+        }
+        // write the values to the motors
+        motorRU.setPower(right);
+        motorLU.setPower(left);
+        motorRD.setPower(right);
+        motorLD.setPower(left);
 
-		wall.setPosition(wallPlace);
-		people.setPosition(peoplePlace);
+        wall.setPosition(wallPlace);
+        people.setPosition(peoplePlace);
 
 //		if (gamepad1.start) { //Must change motor controller mode to read, then back to read
 //			if (motorLD.getDirection() == DcMotor.Direction.REVERSE)
@@ -212,24 +196,27 @@ public class Teleop0_1 extends OpMode {
 		 * are currently write only.
 		 */
 
-		telemetry.addData("Text", "*** Robot Data***");
-		telemetry.addData("left tgt pwr",  "left  pwr: " + String.format("%.2f", left));
-		telemetry.addData("right tgt pwr", "right pwr: " + String.format("%.2f", right));
-		telemetry.addData("left trigger", "left trigger: " + String.format("%.2f", gamepad1.left_trigger));
-		telemetry.addData("right trigger", "right trigger: " + String.format("%.2f", gamepad1.right_trigger));
-		//telemetry.addData("special motors", "special motors: " + String.valueOf(sMotors));
+        telemetry.addData("Text", "*** Robot Data***");
+        telemetry.addData("a", "a: " + String.format("%.2b", gamepad1.a));
+        telemetry.addData("b", "b: " + String.format("%.2b", gamepad1.b));
+        telemetry.addData("x", "y: " + String.format("%.2b", gamepad1.x));
+        telemetry.addData("y", "x: " + String.format("%.2b", gamepad1.y));
+        telemetry.addData("wallplace", "wallplace: " + String.format("%.2f", wallPlace));
+        telemetry.addData("peopleplace", "peopleplace: " + String.format("%.2f", peoplePlace));
 
 
+        //telemetry.addData("special motors", "special motors: " + String.valueOf(sMotors));
 
-	}
 
-	/*
-	 * Code to run when the op mode is first disabled goes here
-	 * 
-	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
-	 */
-	@Override
-	public void stop() {
+    }
 
-	}
+    /*
+     * Code to run when the op mode is first disabled goes here
+     *
+u	 * @see com.qualcomm.robotcore.eventloop.opmode.OpMode#stop()
+     */
+    @Override
+    public void stop() {
+
+    }
 }

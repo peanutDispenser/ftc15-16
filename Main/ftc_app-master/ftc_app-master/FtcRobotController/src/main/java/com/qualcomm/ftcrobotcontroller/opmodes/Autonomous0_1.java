@@ -34,70 +34,140 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.IrSeekerSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * A simple example of a linear op mode that will approach an IR beacon
- */
 public class Autonomous0_1 extends LinearOpMode {
 
-  DcMotor motorRU;	// Right front
-  DcMotor motorLU;	// Right back
-  DcMotor motorLD;	// Left back
-  DcMotor motorRD;	// Left front
-  DcMotor extend1;
-  DcMotor extend2;
-  DcMotor turn;
+    final float TIME1 = 1.75f;
+    final float TIME2 = 1.0f;
+    final float TIME3 = 1.5f;
+    final float POWER = 0.4f;
 
-  Timer clock;
+    DcMotor motorRU;    // Right front
+    DcMotor motorLU;    // Right back
+    DcMotor motorLD;    // Left back
+    DcMotor motorRD;    // Left front
+    DcMotor extend1;
+    DcMotor extend2;
+    DcMotor turn;
 
-  @Override
-  public void runOpMode() throws InterruptedException {
+    Servo wall;
+    float wallPlace;
 
-    // set up the hardware devices we are going to use
-    motorRU = hardwareMap.dcMotor.get("motorRU");
-    motorLU = hardwareMap.dcMotor.get("motorLU");
-    motorRD = hardwareMap.dcMotor.get("motorRD");
-    motorLD = hardwareMap.dcMotor.get("motorLD");
-    extend1 = hardwareMap.dcMotor.get("extend1");
-    extend2 = hardwareMap.dcMotor.get("extend2");
-    turn = hardwareMap.dcMotor.get("turn");
+    Servo people;
+    float peoplePlace;
 
-    motorRU.setDirection(DcMotor.Direction.REVERSE);
-    motorRD.setDirection(DcMotor.Direction.REVERSE);
 
-    // wait for the start button to be pressed
-    waitForStart();
+    Timer clock;
 
-    // wait for the IR Seeker to detect a signal
-   /* if (irSeeker.getAngle() < 0) {
-      // if the signal is to the left move left
-      motorRight.setPower(MOTOR_POWER);
-      motorLeft.setPower(-MOTOR_POWER);
-    } else if (irSeeker.getAngle() > 0) {
-      // if the signal is to the right move right
-      motorRight.setPower(-MOTOR_POWER);
-      motorLeft.setPower(MOTOR_POWER);
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        // set up the hardware devices we are going to use
+        motorRU = hardwareMap.dcMotor.get("motorRU");
+        motorLU = hardwareMap.dcMotor.get("motorLU");
+        motorRD = hardwareMap.dcMotor.get("motorRD");
+        motorLD = hardwareMap.dcMotor.get("motorLD");
+        extend1 = hardwareMap.dcMotor.get("extend1");
+        extend2 = hardwareMap.dcMotor.get("extend2");
+        turn = hardwareMap.dcMotor.get("turn");
+        wall = hardwareMap.servo.get("wall");
+        people = hardwareMap.servo.get("people");
+
+        motorLU.setDirection(DcMotor.Direction.REVERSE);
+        motorLD.setDirection(DcMotor.Direction.REVERSE);
+
+        // wait for the start button to be pressed
+        waitForStart();
+        float left = 0.0f;
+        float right = 0.0f;
+        resetStartTime();
+        while (!gamepad1.a) {
+            motorLD.setPower(POWER);
+            motorLU.setPower(POWER);
+            motorRD.setPower(POWER);
+            motorRU.setPower(POWER);
+        }
+        getRuntime();
+        telemetry.addData("Time1", this.time);
+        wait(2000);
+        resetStartTime();
+        while (!gamepad1.a) {
+            motorLD.setPower(POWER);
+            motorLU.setPower(POWER);
+            motorRD.setPower(-POWER);
+            motorRU.setPower(-POWER);
+        }
+        getRuntime();
+        telemetry.addData("Time2", this.time);
+        wait(2000);
+        resetStartTime();
+        while (!gamepad1.a) {
+            motorLD.setPower(POWER);
+            motorLU.setPower(POWER);
+            motorRD.setPower(-POWER);
+            motorRU.setPower(-POWER);
+        }
+        getRuntime();
+        telemetry.addData("Time2", this.time);
+        wait(2000);
+        resetStartTime();
+        while (!gamepad1.a) {
+            motorLD.setPower(POWER);
+            motorLU.setPower(POWER);
+            motorRD.setPower(POWER);
+            motorRU.setPower(POWER);
+        }
+        getRuntime();
+        telemetry.addData("Time3", this.time);
+        wait(2000);
+        resetStartTime();
+        while (!gamepad1.a) {
+            motorLD.setPower(POWER);
+            motorLU.setPower(POWER);
+            motorRD.setPower(-POWER);
+            motorRU.setPower(-POWER);
+        }
+        getRuntime();
+        telemetry.addData("Time2", this.time);
+        wait(2000);
+        resetStartTime();
+
+//        while (true) {
+//            getRuntime();
+//            if (this.time <= TIME1) {
+//                left = POWER;
+//                right = POWER;
+//            } else if (this.time > TIME1 && this.time <= TIME2) {
+//                // between 5 and 8.5 seconds, point turn right.
+//                left = POWER;
+//                right = -POWER;
+//            } else if (this.time > TIME2 && this.time <= TIME3) {
+//                left = POWER;
+//                right = POWER;
+//            } else {
+//                left = 0;
+//                right = 0;
+//            }
+//
+//            telemetry.addData("time", Double.toString(this.time));
+//            motorLD.setPower(left);
+//            motorLU.setPower(left);
+//            motorRD.setPower(right);
+//            motorRU.setPower(right);
+//        }
     }
-
-    // wait for the robot to center on the beacon
-    while (irSeeker.getAngle() != 0) {
-      waitOneFullHardwareCycle();
+    void wait(double msecs){
+        resetStartTime();
+        getRuntime();
+        while (this.time <= msecs)
+        {
+            getRuntime();
+        }
+        resetStartTime();
+        return;
     }
-
-    // now approach the beacon
-    motorRight.setPower(MOTOR_POWER);
-    motorLeft.setPower(MOTOR_POWER);
-
-    // wait until we are close enough
-    while (irSeeker.getStrength() < HOLD_IR_SIGNAL_STRENGTH) {
-      waitOneFullHardwareCycle();
-    }
-
-    // stop the motors
-    motorRight.setPower(0);
-    motorLeft.setPower(0);*/
-  }
 }
